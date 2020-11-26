@@ -9,7 +9,7 @@ int main()
     constexpr int length{ static_cast<int>(std::size(array)) }; // C++17
     //  constexpr int length{ sizeof(array) / sizeof(array[0]) }; // use instead if not C++17 capable
  
-    for (int j{ 0 }; j < length; ++j)
+    for (int j{ 0 }; j < length - 1; ++j)
     {
         for (int i{ 0 }; i < length - j - 1; ++i)
         {
