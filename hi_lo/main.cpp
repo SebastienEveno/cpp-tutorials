@@ -16,51 +16,56 @@ int getRandomNumber(int min, int max)
     return randomNumber(Random::mersenne);
 }
 
-void playSingleGameHiLo()
+bool playHiLo(int guesses, int randomNumber)
 {
-    std::cout << "Let's play a game.  I'm thinking of a number (between 1 and 100).  You have 7 tries to guess what it is." << '\n';
-    const int randomNumber { getRandomNumber(Constants::minRangeValue, Constants::maxRangeValue) };
-    int count {1};
-
-    while (count <= Constants::maximumNumberOfTries)
+    for (int count {1}; count <= guesses; ++count)
     {
         std::cout << "Guess #" << count << ": ";
         int x {};
         std::cin >> x;
-        // std::cout << '\n';
+
         if (x == randomNumber)
-        {
-            std::cout << "Correct! You win!" << '\n';
-            break;
-        } 
+            return true;
         else if (x > randomNumber)
-        {
             std::cout << "Your guess is too high" << '\n';
-        } 
         else
-        {
             std::cout << "Your guess is too low" << '\n';
-        }
-        ++count;
     }
-    
-    if (count > Constants::maximumNumberOfTries)
-        std::cout << "Sorry, you lose. The correct number was " << randomNumber << ".\n";
+
+    return false;
+
+}
+
+bool playAgain()
+{
+    while (true)
+    {
+        char ch {};
+        std::cout << "Would you like to play again (y/n)?";
+        std::cin >> ch;
+        switch (ch)
+        {
+            case 'y':
+                return true;
+            case 'n':
+                return false;
+        }
+    }
 }
 
 int main()
 {
-    char ch = 'y';
     do 
     {
-        playSingleGameHiLo();
-        do
-        {
-            std::cout << "Would you like to play again (y/n)?";
-            std::cin >> ch;
-        } while ((ch == 'y') || (ch == 'n'));
+        std::cout << "Let's play a game.  I'm thinking of a number (between 1 and 100).  You have 7 tries to guess what it is." << '\n';
+        const int randomNumber { getRandomNumber(Constants::minRangeValue, Constants::maxRangeValue) };
+        bool won = playHiLo(Constants::maximumNumberOfTries, randomNumber);
+        if (won)
+            std::cout << "Correct! You win!" << '\n';
+        else
+            std::cout << "Sorry, you lose. The correct number was " << randomNumber << ".\n";
 
-    } while (ch == 'y');
+    } while (playAgain());
 
     std::cout << "Thank you for playing." << '\n';
 
