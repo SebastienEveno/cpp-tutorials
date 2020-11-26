@@ -4,8 +4,8 @@
 int main() 
 {
     constexpr int array[]{ 4, 6, 7, 3, 8, 2, 1, 9, 5 };
-    int numberOfElements {static_cast<int>(std::size(array))};
-    std::cout << numberOfElements << '\n';
+    int arrayLen{static_cast<int>(std::size(array))};
+    std::cout << arrayLen << '\n';
 
     // Ask the user a number between 1 and 9
     int x {};
@@ -19,16 +19,19 @@ int main()
     } while ((x < 1) || (x > 9));
 
     // Print the array
-    for (int i{ 0 }; i < numberOfElements; ++i)
+    for (int i{ 0 }; i < arrayLen; ++i)
     {
-        std::cout << array[i] << " ";
+        std::cout << array[i] << ' ';
     }
     std::cout << '\n';
 
-    for (int j{ 0 }; j < numberOfElements; ++j)
+    for (int j{ 0 }; j < arrayLen; ++j)
     {
         if (array[j] == x)
+        {
             std::cout << "Corresponding index: " << j << '\n';
+            break;
+        }
     }
     
     return 0;
