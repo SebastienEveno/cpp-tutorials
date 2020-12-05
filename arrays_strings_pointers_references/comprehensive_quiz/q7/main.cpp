@@ -114,7 +114,12 @@ void printCard(const Card& card)
 }
 
 constexpr int numberOfCards {52};
+// Maximum score before losing.
+constexpr int max_score {21};
+// Minimum score that the dealer has to have.
+constexpr int min_score_dealer {17};
 using deck_type = std::array<Card, numberOfCards>;
+using index_type = deck_type::size_type;
 
 deck_type createDeck()
 {
@@ -191,83 +196,84 @@ enum class Status
 
 struct Player 
 {
-    std::array<Card, 2> hand {};
-    Status status;
+    int score{};
 };
 
 bool playBlackJack(const deck_type& deck)
 {
-    int s_dealer { getCardValue(deck[0]) };
-    std::cout << "The dealer's initial card is: " << '\n';
-    printCard(deck[0]);
-
-    int s_player { getCardValue(deck[1]) + getCardValue(deck[2]) };
+    index_type ind{ 0 };
+    // Initialize dealer with 1 card
+    Player dealer { getCardValue(deck[ind]) };
+    std::cout << "The dealer's initial card is: ";
+    printCard(deck[ind]);
+    std::cout << "The dealer's score is: " << dealer.score << '\n';
+    // Initialize player with 2 cards
+    Player player {getCardValue(deck[ind + 1]) + getCardValue(deck[ind + 2])};
     std::cout << "Your initial cards are: " << '\n';
-    printCard(deck[1]);
-    printCard(deck[2]);
+    printCard(deck[ind + 1]);
+    printCard(deck[ind + 2]);
 
-    int ind {3};
+    ind += 3;
     // player goes first
-    if (s_player > 21)
+    if (player.score > max_score)
     {
         // bust and lose immediately
-        std::cout << "The sum of your cards is " << s_player << ". " << '\n';
-        std::cout << "The sum of your cards are higher than 21. You lose!" << '\n';
+        std::cout << "The sum of your cards is " << player.score << ". " << '\n';
+        std::cout << "The sum of your cards are higher than 21." << '\n';
         return false;
     }
     else 
     {
         std::string hitOrStand{ "hit" };
-        while ((hitOrStand != "stand") && (s_player < 22))
+        while ((hitOrStand != "stand") && (player.score <= max_score))
         {
             // check if player hit or stand
-            std::cout << "The sum of your cards is " << s_player << ". " << '\n';
+            std::cout << "The sum of your cards is " << player.score << ". " << '\n';
             std::cout << "Do you want to hit or stand? ";
             std::cin >> hitOrStand;
             if (hitOrStand == "hit")
             {
-                std::cout << "You draw the card: ";
+                std::cout << "You draw a card: ";
                 printCard(deck[ind]);
-                s_player += getCardValue(deck[ind]);
+                player.score += getCardValue(deck[ind]);
                 ++ind;
             }
         }
     }
 
     // check if bust
-    if (s_player > 21)
+    if (player.score > max_score)
     {
-        std::cout << "The sum of your cards is: " << s_player << '\n';
-        std::cout << "The sum of your cards is higher than 21. You lose!" << '\n';
+        std::cout << "The sum of your cards is: " << player.score << '\n';
+        std::cout << "The sum of your cards is higher than 21." << '\n';
         return false;
     }
 
     // dealer turn
     do
     {
-        std::cout << "The dealer draws the card: ";
+        std::cout << "The dealer draws a card: ";
         printCard(deck[ind]);
-        s_dealer += getCardValue(deck[ind]);
-        std::cout << "The sum of the dealer's cards is: " << s_dealer << '\n';
+        dealer.score += getCardValue(deck[ind]);
+        std::cout << "The sum of the dealer's cards is: " << dealer.score << '\n';
         ++ind;
-    } while (s_dealer < 17);
+    } while (dealer.score < min_score_dealer);
 
-    if (s_dealer > 21)
+    if (dealer.score > max_score)
     {
         std::cout << "The sum of the dealer's cards is more than 21." << '\n';
-        std::cout << "You win!";
         return true;
     }
     else
     {
-        if (s_player > s_dealer)
+        if (player.score > dealer.score)
         {
-            std::cout << "Your sum is higher than the dealer's one. You win!" << '\n';
+            std::cout << "Your sum is higher than the dealer's one." << '\n';
             return true;
         }
         else
         {
-            std::cout << "The dealer's sum is equal or higher. You lose!" << '\n';
+            std::cout << "The dealer's sum is equal or higher." << '\n';
             return false;
         }
     }
@@ -277,6 +283,14 @@ int main()
 {
     deck_type deck{ createDeck() };
     shuffleDeck(deck);
-    bool game{ playBlackJack(deck) };
+    if (playBlackJack(deck))
+    {
+        std::cout << "You win!\n";
+    }
+    else
+    {
+        std::cout << "You lose!\n";
+    }
+    
     return 0;
 }
