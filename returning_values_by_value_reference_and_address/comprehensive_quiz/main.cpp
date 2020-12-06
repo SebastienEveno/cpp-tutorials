@@ -11,7 +11,6 @@ struct as input.*/
 
 struct Employee
 {
-    std::string name{};
 };
 void printEmployeeName(const Employee &employee);
 
