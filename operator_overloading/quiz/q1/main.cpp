@@ -1,82 +1,55 @@
-// https://www.learncpp.com/cpp-tutorial/92-overloading-the-arithmetic-operators-using-friend-functions/
-
-// Question #1
+// https://www.learncpp.com/cpp-tutorial/9-x-chapter-9-comprehensive-quiz/
 
 #include <iostream>
+#include <cstdint>
 
-class Fraction
+class Average
 {
-private:
-    int m_numerator{};
-    int m_denominator{};
-
+    std::int_least32_t m_sumSoFar{};
+    std::int_least8_t m_numbersSeenSoFar{};
 public:
-    Fraction(int numerator=0, int denumerator=1) : m_numerator{numerator}, m_denominator{denumerator}
+    Average(std::int_least32_t sum=0, std::int_least8_t n=0)
+        : m_sumSoFar{sum}, m_numbersSeenSoFar{n}
     {
-        reduce();
     }
 
-    void print() const
+    friend std::ostream& operator<<(std::ostream &out, const Average &avg);
+    
+    Average& operator+=(int n)
     {
-        std::cout << m_numerator << '/' << m_denominator << '\n';
+        m_sumSoFar += n;
+        ++m_numbersSeenSoFar;
+        return *this;
     }
-
-    static int gcd(int a, int b) 
-    {
-        return (b == 0) ? (a > 0 ? a : -a) : gcd(b, a % b);
-    }
-
-    void reduce()
-    {
-        if (m_numerator != 0 && m_denominator != 0)
-		{
-			int gcd{ Fraction::gcd(m_numerator, m_denominator) };
-			m_numerator /= gcd;
-			m_denominator /= gcd;
-		}
-    }
-
-    friend Fraction operator*(const Fraction &f1, const Fraction &f2);
-
-    friend Fraction operator*(int n, const Fraction &f);
-
-    friend Fraction operator*(const Fraction &f, int n);
 };
 
-Fraction operator*(const Fraction &f1, const Fraction &f2)
+std::ostream& operator<<(std::ostream &out, const Average &avg)
 {
-    return { f1.m_numerator * f2.m_numerator, f1.m_denominator * f2.m_denominator };
-}
-
-Fraction operator*(int n, const Fraction &f)
-{
-    return { n * f.m_numerator, f.m_denominator };
-}
-
-Fraction operator*(const Fraction &f, int n)
-{
-    return { n * f.m_numerator, f.m_denominator };
+    out << static_cast<double>(avg.m_sumSoFar) / avg.m_numbersSeenSoFar << '\n';
+    return out;
 }
 
 int main()
 {
-    Fraction f1{2, 5};
-    f1.print();
+	Average avg{};
+	
+	avg += 4;
+	std::cout << avg << '\n'; // 4 / 1 = 4
+	
+	avg += 8;
+	std::cout << avg << '\n'; // (4 + 8) / 2 = 6
  
-    Fraction f2{3, 8};
-    f2.print();
+	avg += 24;
+	std::cout << avg << '\n'; // (4 + 8 + 24) / 3 = 12
  
-    Fraction f3{ f1 * f2 };
-    f3.print();
+	avg += -10;
+	std::cout << avg << '\n'; // (4 + 8 + 24 - 10) / 4 = 6.5
  
-    Fraction f4{ f1 * 2 };
-    f4.print();
+	(avg += 6) += 10; // 2 calls chained together
+	std::cout << avg << '\n'; // (4 + 8 + 24 - 10 + 6 + 10) / 6 = 7
  
-    Fraction f5{ 2 * f2 };
-    f5.print();
+	Average copy{ avg };
+	std::cout << copy << '\n';
  
-    Fraction f6{ Fraction{1, 2} * Fraction{2, 3} * Fraction{3, 4} };
-    f6.print();
- 
-    return 0;
+	return 0;
 }
