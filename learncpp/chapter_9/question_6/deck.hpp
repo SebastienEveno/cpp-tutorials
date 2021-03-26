@@ -45,6 +45,13 @@ public:
         static std::mt19937 mt{ static_cast<std::mt19937::result_type>(std::time(nullptr)) };
         std::shuffle(m_deck.begin(), m_deck.end(), mt);
     }
+    vector_type getCards() const { return m_deck; }
+    Card getNextCard() const
+    {
+        static index_type nextCardIndex{ 0 };
+        return m_deck[nextCardIndex++];
+    }
+    int getNextCardValue() const { return (*this).getNextCard().getCardValue(); }
 };
 
 #endif

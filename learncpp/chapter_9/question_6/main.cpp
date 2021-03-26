@@ -1,11 +1,13 @@
 #include "deck.hpp"
+#include "blackjack.hpp"
 
 int main()
 {
-    Deck d;
-    d.printDeck();
-    d.shuffleDeck();
-    d.printDeck();
+    Blackjack game{};
+    if (game.playBlackjack())
+        std::cout << "You won!\n";
+    else
+        std::cout << "Dealer won.\n";
+    
     return 0;
 }
-

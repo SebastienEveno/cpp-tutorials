@@ -107,7 +107,7 @@ public:
                 break;
         }
     }
-    int getCardValue()
+    int getCardValue() const
     {
         switch(m_rank)
         {
