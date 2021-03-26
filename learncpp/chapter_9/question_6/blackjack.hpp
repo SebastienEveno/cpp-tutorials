@@ -31,7 +31,7 @@ public:
         if(player.turn(m_deck, m_target_score))
             return false;
         
-        if(dealer.turn(m_deck, m_minimal_dealer_score))
+        if(dealer.turn(m_deck, m_target_score))
             return true;
         
         return player.getScore() > dealer.getScore();
