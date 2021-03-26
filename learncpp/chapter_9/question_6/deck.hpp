@@ -51,7 +51,7 @@ public:
         static index_type nextCardIndex{ 0 };
         return m_deck[nextCardIndex++];
     }
-    int getNextCardValue() const { return (*this).getNextCard().getCardValue(); }
+    int getNextCardValue() const { return getNextCard().getCardValue(); }
 };
 
 #endif
