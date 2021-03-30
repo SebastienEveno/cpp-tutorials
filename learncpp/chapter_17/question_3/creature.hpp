@@ -60,6 +60,64 @@ public:
     }
 
     bool hasWon() const { return m_level >= 20; }
+
+    void attack(Monster& monster)
+    {
+        // If the player is dead, we can't attack the monster
+        if (isDead())
+            return;
+        std::cout << "You hit the " << monster.getName() << " for " << getDamage() << " damage.\n";
+        // Reduce the monster's health by the player's damage
+        monster.reduceHealth(getDamage());
+
+        // If the monster is now dead, level the player up
+        if (monster.isDead())
+        {
+            std::cout << "You killed the " << monster.getName() << ".\n";
+            levelUp();
+            std::cout << "You are now level " << getLevel() << ".\n";
+            std::cout << "You found " << monster.getGold() << " gold.\n";
+            addGold(monster.getGold());
+        }
+    }
+
+    // This function handles the entire fight between a player and a randomly generated monster
+    void fightMonster()
+    {
+        // First randomly generate a monster
+        Monster monster{ Monster::getRandomMonster() };
+        std::cout << "You have encountered a " << monster.getName() << " (" << monster.getSymbol() << ").\n";
+        // While the monster isn't dead and the player isn't dead, the fight continues
+        while (!monster.isDead() && !isDead())
+        {
+            std::cout << "(R)un or (F)ight: ";
+            char input{};
+            std::cin >> input;
+            if (input == 'R' || input == 'r')
+            {
+                // 50% chance of fleeing successfully
+                if (getRandomNumber(1, 2) == 1)
+                {
+                    std::cout << "You successfully fled.\n";
+                    return; // success ends the encounter
+                }
+                else
+                {
+                    // Failure to flee gives the monster a free attack on the player
+                    std::cout << "You failed to flee.\n";
+                    monster.attack(*this);
+                    continue;
+                }
+            }
+
+            if (input == 'F' || input == 'f')
+            {
+                // Player attacks first, monster attacks second
+                attack(monster);
+                monster.attack(*this);
+            }
+        }
+    }
 };
 
 class Monster : public Creature
@@ -79,6 +137,17 @@ public:
     {
         int random_number{ getRandomNumber(0, static_cast<int>(Type::max_types) - 1) };
         return Monster(static_cast<Type>(random_number));
+    }
+
+    void attack(Player& player)
+    {
+        // If the monster is dead, it can't attack the player
+        if (isDead())
+            return;
+        
+        // Reduce the player's health by the monster's damage
+        player.reduceHealth(getDamage());
+        std::cout << "The " << getName() << " hit you for " << getDamage() << " damage.\n";
     }
 
 private:
