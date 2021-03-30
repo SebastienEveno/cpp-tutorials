@@ -3,45 +3,54 @@
 
 #include <iostream>
 
-enum class CardRank
-{
-    rank_2,
-    rank_3,
-    rank_4,
-    rank_5,
-    rank_6,
-    rank_7,
-    rank_8,
-    rank_9,
-    rank_10,
-    rank_jack,
-    rank_queen,
-    rank_king,
-    rank_ace,
 
-    max_ranks
-};
-
-enum class CardSuit
-{
-    suit_club,
-    suit_diamond,
-    suit_heart,
-    suit_spade,
-
-    max_suits
-};
 
 class Card
 {
-private:
-    CardRank m_rank{};
-    CardSuit m_suit{};
 public:
+    enum class CardRank
+    {
+        rank_2,
+        rank_3,
+        rank_4,
+        rank_5,
+        rank_6,
+        rank_7,
+        rank_8,
+        rank_9,
+        rank_10,
+        rank_jack,
+        rank_queen,
+        rank_king,
+        rank_ace,
+
+        max_ranks
+    };
+
+    enum class CardSuit
+    {
+        suit_club,
+        suit_diamond,
+        suit_heart,
+        suit_spade,
+
+        max_suits
+    };
+    // When using a std::array (or std::vector) where the elements are a class type, 
+    // your element’s class must have a default constructor so the elements can be 
+    // initialized to a reasonable default state. If you do not provide one, you’ll get 
+    // a cryptic error about attempting to reference a deleted function.
+    Card() = default;
+
+    Card(CardRank rank, CardSuit suit) : m_rank{rank}, m_suit{suit} {}
+
     void setRank(const CardRank& rank){ m_rank = rank; }
 
+    CardRank getRank() const { return m_rank; }
+    
     void setSuit(const CardSuit& suit){ m_suit = suit; }
-    void printCard() const
+    
+    void print() const
     {
         switch(m_rank)
         {
@@ -107,7 +116,8 @@ public:
                 break;
         }
     }
-    int getCardValue() const
+
+    int getValue() const
     {
         switch(m_rank)
         {
@@ -138,6 +148,9 @@ public:
                 return 0; 
         }
     }
+private:
+    CardRank m_rank{};
+    CardSuit m_suit{};
 };
 
 #endif

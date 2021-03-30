@@ -3,24 +3,36 @@
 
 #include "deck.hpp"
 
-enum class PlayerStatus
-{
-    hit,
-    stand,
-    none
-};
-
 class Player
 {
-private:
+protected:
     int m_score;
+    int m_ace_counter; // number of aces in the player's hands
 public:
-    Player(int score=0) : m_score{score} {}
-    void addToScore(int a) { m_score += a; }
+    Player(int score=0, int ace_counter=0) : m_score{score}, m_ace_counter{ace_counter} {}
+    
     void setScore(int score) { m_score = score; }
-    int getScore() { return m_score; }
-    virtual void showingScore() { std::cout << "You have: " << m_score << '\n'; }
-    bool wantsHit()
+    
+    int getScore() const { return m_score; }
+    
+    virtual void showingScore() const { std::cout << "You have: " << m_score << '\n'; }
+    
+    Card drawCard(Deck& deck)
+    {
+        Card card { deck.getNextCard() };
+        m_score += card.getValue();
+        return card;
+    }
+
+    virtual void drawCardAndPrint(Deck& deck)
+    {
+        std::cout << "You draw a ";
+        drawCard(deck).print();
+        std::cout << '\n';
+        showingScore();
+    }
+
+    bool wantsHit() const
     {
         while (true)
         {
@@ -36,11 +48,14 @@ public:
             }
         }
     }
-    virtual bool turn(const Deck& deck, int target_score)
+    
+    bool isBust(int target_score) const { return (m_score > target_score); }
+
+    virtual bool turn(Deck& deck, int target_score)
     {
         while(true)
         {
-            if(m_score > target_score)
+            if(isBust(target_score))
             {
                 std::cout << "You score is higher than 21!\n";
                 return true;
@@ -49,11 +64,7 @@ public:
             {
                 if (wantsHit())
                 {
-                    Card card{ deck.getNextCard() };
-                    m_score += card.getCardValue();
-                    std::cout << "You draw a ";
-                    card.printCard();
-                    std::cout << " and now have " << m_score << '\n';
+                    drawCardAndPrint(deck);
                 }
                 else
                 {
@@ -70,18 +81,26 @@ class Dealer : public Player
 private:
     int m_minimal_score;
 public:
-    Dealer(int minimal_score, int score=0)
-        : Player(score), m_minimal_score{minimal_score} {}
-    void showingScore() { std::cout << "The dealer is showing: " << getScore() << '\n'; }
-    bool turn(const Deck& deck, int target_score)
+    Dealer(int minimal_score, int score=0, int ace_counter=0)
+        : Player(score, ace_counter), m_minimal_score{minimal_score} {}
+    
+    void showingScore() const { std::cout << "The dealer is showing: " << getScore() << '\n'; }
+    
+    void drawCardAndPrint(Deck& deck)
+    {
+        std::cout << "The dealer turned up a ";
+        drawCard(deck).print();
+        std::cout << '\n';
+        showingScore();
+    }
+
+    bool turn(Deck& deck, int target_score)
     {
         while(getScore() < m_minimal_score)
         {
-            Card card{ deck.getNextCard() };
-            addToScore(card.getCardValue());
-            std::cout << "The dealer turned up a " << card.getCardValue() << " and now has " << getScore() << '\n';
+            drawCardAndPrint(deck);
         }
-        if(getScore() > target_score)
+        if(isBust(target_score))
         {
             std::cout << "The dealer busted!\n";
             return true;

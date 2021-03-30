@@ -4,54 +4,56 @@
 #include <algorithm> // for std::shuffle
 #include <ctime> // for std::time
 #include <random> // for std::mt19937
+#include <array>
+#include <cassert> // for assert
 
 #include "card.hpp"
 
-constexpr int number_of_cards{ 52 };
-using vector_type = std::vector<Card>;
-using index_type = vector_type::size_type;
-
 class Deck
 {
+public:
+    using array_type = std::array<Card, 52>;
+    using index_type = array_type::size_type;
+
 private:
-    vector_type m_deck;
+    array_type m_deck{};
+    index_type m_nextCardIndex{ 0 };
 public:
     Deck()
     {
-        vector_type deck(static_cast<index_type>(number_of_cards));
-        int k{ 0 };
-        for(int i{ 0 }; i < static_cast<int>(CardRank::max_ranks); ++i)
+        index_type k{ 0 };
+        for(int i{ 0 }; i < static_cast<int>(Card::CardRank::max_ranks); ++i)
         {
-            for(int j{ 0 }; j < static_cast<int>(CardSuit::max_suits); ++j)
+            for(int j{ 0 }; j < static_cast<int>(Card::CardSuit::max_suits); ++j)
             {
-                deck[k].setRank(static_cast<CardRank>(i));
-                deck[k].setSuit(static_cast<CardSuit>(j));
+                m_deck[k].setRank(static_cast<Card::CardRank>(i));
+                m_deck[k].setSuit(static_cast<Card::CardSuit>(j));
                 ++k;
             }
         }
-        m_deck = deck;
     }
-    void printDeck() const
+    void print() const
     {
         for(const auto& card : m_deck)
         {
-            card.printCard();
+            card.print();
             std::cout << ' ';
         }
         std::cout << '\n';
     }
-    void shuffleDeck()
+    void shuffle()
     {
         static std::mt19937 mt{ static_cast<std::mt19937::result_type>(std::time(nullptr)) };
         std::shuffle(m_deck.begin(), m_deck.end(), mt);
+        m_nextCardIndex = 0;
     }
-    vector_type getCards() const { return m_deck; }
-    Card getNextCard() const
+    array_type getCards() const { return m_deck; }
+    const Card& getNextCard()
     {
-        static index_type nextCardIndex{ 0 };
-        return m_deck[nextCardIndex++];
+        assert(m_nextCardIndex < m_deck.size());
+        return m_deck[m_nextCardIndex++];
     }
-    int getNextCardValue() const { return getNextCard().getCardValue(); }
+    int getNextCardValue() { return getNextCard().getValue(); }
 };
 
 #endif

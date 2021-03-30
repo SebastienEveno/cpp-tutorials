@@ -20,7 +20,7 @@ public:
     bool playBlackjack()
     {
         // shuffle deck
-        m_deck.shuffleDeck();
+        m_deck.shuffle();
         // Dealer gets first card to start
         Dealer dealer{ m_minimal_dealer_score, m_deck.getNextCardValue() };
         dealer.showingScore();
