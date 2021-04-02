@@ -15,7 +15,7 @@ int main()
 
     while(!player.isDead() && !player.hasWon())
     {
-        player.fightMonster();
+        fightMonster(player);
     }
     if (player.isDead())
     {
